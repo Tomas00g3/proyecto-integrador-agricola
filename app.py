@@ -24,7 +24,7 @@ st.markdown("""
         border: 1px solid #00d285;
         border-radius: 10px;
         padding: 15px 20px;
-        margin-top: 10px;
+        margin-top: 15px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -97,7 +97,7 @@ gB = df_raw[df_raw["tipo_tratamiento"] == "Tratamiento_B"]["rendimiento_ton"]
 t_stat, p_valor = stats.ttest_ind(gB, gA, alternative="greater", equal_var=False)
 diff_medias = gB.mean() - gA.mean()
 
-# 5. Cabecera y 3 Tarjetas KPI (Fase 5)
+# 5. Cabecera y 3 Tarjetas KPI
 st.title("Optimización Inferencial del Rendimiento Agrícola")
 st.markdown("Análisis de **Regresión Múltiple (OLS)** y **Evaluación Experimental de Bio-estimulantes**.")
 
@@ -108,7 +108,7 @@ k3.metric("P-Valor Prueba Inferencial", f"{p_valor:.2e}", "p < 0.05 (Significati
 
 st.markdown("---")
 
-# 6. Cuadrícula 2x2 de las 4 Gráficas Técnicas (Fase 4 y 5)
+# 6. Cuadrícula 2x2 de las 4 Gráficas Técnicas
 tab1, tab2, tab3 = st.tabs(["Dashboard Analítico (2x2)", "Ecuación y Veredicto", "Base de Datos"])
 
 with tab1:
@@ -153,8 +153,32 @@ with tab1:
 
 with tab2:
     b0, b1, b2 = modelo.params["const"], modelo.params["volumen_riego"], modelo.params["fertilizante_kg"]
+    rmse = np.sqrt(np.mean(df["residuos"]**2))
+    
     st.subheader("Ecuación de Regresión Estimada")
     st.latex(rf"\widehat{{\text{{Rendimiento}}}} = {b0:.3f} + {b1:.4f}(\text{{Riego}}) + {b2:.4f}(\text{{Fertilizante}})")
+    
+    st.markdown(f"**Error Cuadrático Medio (RMSE):** `{rmse:.4f} ton/ha` | **Estadístico t (Tratamiento B vs. A):** `{t_stat:.4f}`")
+    
+    st.subheader("Resumen de Coeficientes del Modelo OLS (statsmodels)")
+    resumen_ols = pd.DataFrame({
+        "Variable": ["Intercepto (const)", "Volumen de Riego (m³/ha)", "Fertilizante (kg/ha)"],
+        "Coeficiente (Beta)": modelo.params.values,
+        "Error Estándar": modelo.bse.values,
+        "Estadístico t": modelo.tvalues.values,
+        "P-valor (P>|t|)": modelo.pvalues.values
+    })
+    st.dataframe(
+        resumen_ols.style.format({
+            "Coeficiente (Beta)": "{:.4f}",
+            "Error Estándar": "{:.4f}",
+            "Estadístico t": "{:.3f}",
+            "P-valor (P>|t|)": "{:.4e}"
+        }),
+        use_container_width=True,
+        hide_index=True
+    )
+
     st.markdown(f"""
     <div class="verdict-box">
         <strong>VEREDICTO DE INGENIERÍA (p = {p_valor:.5f} < 0.05):</strong><br>
