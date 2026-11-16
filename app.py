@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # 1. Configuración de página y estilos visuales
-st.set_page_config(page_title="AgroTech Analytics U4", page_icon="🌱", layout="wide")
+st.set_page_config(page_title="AgroTech Analytics U4", layout="wide")
 
 st.markdown("""
 <style>
@@ -49,7 +49,7 @@ df_raw = cargar_datos()
 
 # 3. Barra lateral con filtros dinámicos (Hito 4)
 with st.sidebar:
-    st.title("🌱 Telemetría Agrícola")
+    st.title("Telemetría Agrícola")
     st.caption("Invernadero Inteligente • Jitomate / Aguacate")
     st.markdown("---")
     tratamientos = st.multiselect(
@@ -164,5 +164,5 @@ with tab2:
     """, unsafe_allow_html=True)
 
 with tab3:
-    st.subheader("🗄️ Registro de Telemetría de Parcelas (N=100)")
+    st.subheader("Registro de Telemetría de Parcelas (N=100)")
     st.dataframe(df, use_container_width=True)
